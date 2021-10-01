@@ -48,14 +48,14 @@ public class GameState implements Serializable {
         this.userId = userId;
     }
 
-    public String serializeBoardToJsonString(Cell[][] boardArray){
+    public String serializeBoardToJsonString(Cell[][] boardArray) {
         Gson gson = new Gson();
         String recordsSerialized = gson.toJson(boardArray);
         System.out.println("Serialize Version: " + recordsSerialized);
-        return  recordsSerialized;
+        return recordsSerialized;
     }
 
-    public Cell[][] stringToBoardArray(String retrieveBoard){
+    public Cell[][] stringToBoardArray(String retrieveBoard) {
         Gson gson = new Gson();
         Cell retrievedArray[][] = gson.fromJson(retrieveBoard, Cell[][].class);
         //System.out.println("De - Serialize Version: " + retrievedArray);
@@ -67,8 +67,6 @@ public class GameState implements Serializable {
         } */
         return retrievedArray;
     }
-
-
 
 
 }
