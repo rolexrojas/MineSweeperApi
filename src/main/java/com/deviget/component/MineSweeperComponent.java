@@ -1,22 +1,35 @@
 package com.deviget.component;
 
 import com.deviget.domain.Cell;
+import com.deviget.domain.GameState;
+import com.deviget.exception.NoGameFoundException;
+import com.deviget.repository.GameStateRepository;
 import com.deviget.types.BoardMoveResponse;
 import com.deviget.types.BoardMoveResponseType;
 import com.deviget.types.CellTypes;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@Component
 public class MineSweeperComponent {
     private Cell[][] boardArray;
     private Cell[][] minesArray;
+    private GameStateRepository gameStateRepository;
+
+    @Autowired
+    public void setGameStateRepository(GameStateRepository gameStateRepository) {
+        this.gameStateRepository = gameStateRepository;
+    }
 
     private Set<Cell> minesOnBoard = new LinkedHashSet<>();
     private void setMinesOnBoard(Set<Cell> minesOnBoard) {
         this.minesOnBoard = minesOnBoard;
     }
+
 
     public void setMinesArray(Cell[][] minesArray) {
         this.minesArray = minesArray;
@@ -37,6 +50,24 @@ public class MineSweeperComponent {
 
 
     private final int ZERO = 0;
+
+    public void clearGameData(){
+        setBoardArray(null);
+        setMinesArray(null);
+    }
+
+    public void saveCurrentGame() throws NoGameFoundException {
+
+        if(this.getBoardArray() == null){
+            throw new NoGameFoundException("No game was found");
+        }
+
+
+    }
+
+    public void resumeGame() throws NoGameFoundException {
+
+    }
 
     public void GameSetup(){
         //generate boardArray with no of cells
