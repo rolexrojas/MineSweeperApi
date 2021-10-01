@@ -49,11 +49,11 @@ public class UserAuthController {
         this.jwtManager = jwtManager;
     }
 
-    @PostMapping(path="/userSignIn")
-    public ResponseEntity userSignIn(@RequestBody SignInDTO signInDTO){
+    @PostMapping(path = "/userSignIn")
+    public ResponseEntity userSignIn(@RequestBody SignInDTO signInDTO) {
 
         boolean isValid = Validator.isValidSignIn(signInDTO);
-        if(!isValid){
+        if (!isValid) {
             return ResponseEntity.status(400).build();
         }
         try {
@@ -61,10 +61,10 @@ public class UserAuthController {
             boolean isVerifiedPassword = passwordStorage.verifyPassword(signInDTO.getPassword(), userAccount.getPassword());
 
             System.out.println("password verified" + isVerifiedPassword);
-            if(!isVerifiedPassword){
+            if (!isVerifiedPassword) {
                 return ResponseEntity.status(403).build();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(401).build();
         }
 
@@ -76,17 +76,17 @@ public class UserAuthController {
     }
 
 
-    @PostMapping(path="/userSignUp")
-    public ResponseEntity userSignUp(@RequestBody SignUpDTO signUpDTO){
+    @PostMapping(path = "/userSignUp")
+    public ResponseEntity userSignUp(@RequestBody SignUpDTO signUpDTO) {
 
         boolean isValid = Validator.isValidSignUp(signUpDTO);
-        if(!isValid){
+        if (!isValid) {
             return ResponseEntity.status(400).build();
         }
         String hash = "";
         try {
             hash = passwordStorage.createHash(signUpDTO.getPassword());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(401).build();
         }
         UserAuth userAuth = new UserAuth(signUpDTO.getUsername(), hash, false);

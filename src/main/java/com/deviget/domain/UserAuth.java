@@ -15,7 +15,7 @@ public class UserAuth implements Serializable {
     private String password;
     private boolean blocked;
 
-    public  UserAuth(){
+    public UserAuth() {
     }
 
     public UserAuth(String username, String password, boolean blocked) {
