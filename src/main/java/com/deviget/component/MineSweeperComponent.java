@@ -161,7 +161,7 @@ public class MineSweeperComponent {
     }
 
     public static void main(String[] args) {
-        MineSweeperComponent mineSweeperComponent = new MineSweeperComponent();
-        mineSweeperComponent.GameSetup();
+       // MineSweeperComponent mineSweeperComponent = new MineSweeperComponent();
+       // mineSweeperComponent.GameSetup();
     }
 }
