@@ -1,6 +1,9 @@
 package com.deviget.component;
 
 import com.deviget.domain.Cell;
+import com.deviget.types.BoardMoveResponse;
+import com.deviget.types.BoardMoveResponseType;
+import com.deviget.types.CellTypes;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -21,6 +24,16 @@ public class MineSweeperComponent {
     public void setBoardArray(Cell[][] boardArray) {
         this.boardArray = boardArray;
     }
+
+    public Cell[][] getBoardArray() {
+        return boardArray;
+    }
+
+    private Set<Cell> getMinesOnBoard() {
+        return minesOnBoard;
+    }
+
+
 
     private final int ZERO = 0;
 
@@ -160,8 +173,87 @@ public class MineSweeperComponent {
         }
     }
 
-    public static void main(String[] args) {
-       // MineSweeperComponent mineSweeperComponent = new MineSweeperComponent();
-       // mineSweeperComponent.GameSetup();
+    public BoardMoveResponse makeMoveAndGetResult(int columnIndex, int rowIndex){
+
+        Cell cell = new Cell(columnIndex, rowIndex,  0, "Empty");
+        System.out.println("Clicked Cell=> " + cell.getColumnIndex() + " | " + cell.getRowElement());
+
+
+        Cell cellBoard = this.getBoardArray()[cell.getColumnIndex()][cell.getRowElement()];
+
+        //marked as revealed
+        cellBoard.setSeen(true);
+        BoardMoveResponse boardMoveResponse = new BoardMoveResponse();
+        LinkedHashSet<Cell> numberCell = new LinkedHashSet<>();
+        LinkedHashSet<Cell> emptyCell = new LinkedHashSet<>();
+
+        if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.EMPTY.label)){
+            System.out.println("Clicked a Empty => " + cellBoard.getColumnIndex() + cellBoard.getRowElement() + cellBoard.getGameRole());
+        }
+
+        if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.NUMBER.label)){
+            System.out.println("Clicked a Number => " + cellBoard.getColumnIndex() + cellBoard.getRowElement() + cellBoard.getGameRole());
+            boardMoveResponse.setBoardMoveResponseType(BoardMoveResponseType.GAME_INFO);
+            numberCell.add(cellBoard);
+            boardMoveResponse.setEmptyCellList(emptyCell);
+            boardMoveResponse.setNumberCellList(numberCell);
+
+        }
+
+        if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.BOMB.label)){
+            System.out.println("[GAME OVER ] - Clicked a Bomb => " + cellBoard.getColumnIndex() + cellBoard.getRowElement() + cellBoard.getGameRole());
+
+            boardMoveResponse.setBoardMoveResponseType(BoardMoveResponseType.GAME_OVER);
+            boardMoveResponse.setEmptyCellList(emptyCell);
+            boardMoveResponse.setNumberCellList(numberCell);
+            boardMoveResponse.setBombCellList(getMinesOnBoard());
+            //End Of game and return all bombs
+
+            return  boardMoveResponse;
+        }
+
+        if(hasWinGame(this.getBoardArray())){
+            boardMoveResponse.setBoardMoveResponseType(BoardMoveResponseType.GAME_WON);
+            int x =0;
+            System.out.println();
+            while(x < 30){
+                System.out.print("\t\t[GAME WON ] - !!Victory!!");
+                if(x == 10)System.out.println();
+                if(x == 20)System.out.println();
+                x++;
+            }
+        }
+
+
+        return boardMoveResponse;
+    }
+
+
+    public boolean hasWinGame(Cell[][] boardArray){
+
+        System.out.println("GAME VIEW REPRESENTATION");
+        int totalToWin = ((7 -1) * (7 -1) - 4);
+        boolean resp = false;
+        int leftCounter = 0;
+        for(int x = 1; x < 7; x++){
+            System.out.println();
+            for(int y = 1; y < 7; y++) {
+                if(boardArray[x][y] != null){
+
+                    String viewStatus = boardArray[x][y].isSeen() ? "[---"+ boardArray[x][y].getRowValue()+ "--]" : "[Hidden]";
+                    // boardArray[x][y].isSeen() ? "Seen" : "Hidden";
+                    System.out.print("\t" +  viewStatus + "   ||   ");
+                    if(boardArray[x][y].isSeen()){
+                        leftCounter++;
+                    }
+                }
+            }
+        }
+
+        if(leftCounter == totalToWin){
+            resp = true;
+        }
+
+        return resp;
     }
 }
