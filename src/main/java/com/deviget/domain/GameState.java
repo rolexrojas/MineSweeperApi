@@ -1,5 +1,7 @@
 package com.deviget.domain;
 
+import com.google.gson.Gson;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -18,6 +20,7 @@ public class GameState implements Serializable {
     @Column(name = "user_id")
     private String userId;
 
+    @Lob
     @Column(name = "board_array")
     private String boardArray;
 
@@ -44,6 +47,27 @@ public class GameState implements Serializable {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public String serializeBoardToJsonString(Cell[][] boardArray){
+        Gson gson = new Gson();
+        String recordsSerialized = gson.toJson(boardArray);
+        System.out.println("Serialize Version: " + recordsSerialized);
+        return  recordsSerialized;
+    }
+
+    public Cell[][] stringToBoardArray(String retrieveBoard){
+        Gson gson = new Gson();
+        Cell retrievedArray[][] = gson.fromJson(retrieveBoard, Cell[][].class);
+        //System.out.println("De - Serialize Version: " + retrievedArray);
+        /*
+        for(int x = 1; x < retrievedArray.length; x++){
+            for(int y = 1; y < retrievedArray.length; y++){
+                System.out.println("Element found: " + retrievedArray[x][y].getColumnIndex() + + retrievedArray[x][y].getRowElement());
+            }
+        } */
+        return retrievedArray;
+    }
+
 
 
 

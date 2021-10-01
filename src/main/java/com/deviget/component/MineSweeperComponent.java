@@ -62,11 +62,26 @@ public class MineSweeperComponent {
             throw new NoGameFoundException("No game was found");
         }
 
-
+        GameState gameState = new GameState();
+        gameState.setBoardArrayString(gameState.serializeBoardToJsonString(this.getBoardArray()));
+        gameState.setGameId("anUserIdTest20L");
+        gameState.setUserId("anUserIdTest");
+        gameStateRepository.save(gameState);
     }
 
     public void resumeGame() throws NoGameFoundException {
-
+        try {
+            clearGameData();
+            GameState gameState = gameStateRepository.findFirstByGameIdEquals("anUserIdTest20L");
+            System.out.println("Game found");
+            System.out.println(gameState.getUserId());
+            Cell[][] retrievedBoard = gameState.stringToBoardArray(gameState.getBoardArrayString());
+            hasWinGame(retrievedBoard);
+            this.setBoardArray(retrievedBoard);
+            System.out.println("Game found finish display");
+        }catch (Exception e){
+            throw new NoGameFoundException("No game was found");
+        }
     }
 
     public void GameSetup(){
