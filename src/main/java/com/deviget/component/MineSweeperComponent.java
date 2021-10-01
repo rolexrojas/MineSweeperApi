@@ -256,4 +256,151 @@ public class MineSweeperComponent {
 
         return resp;
     }
+
+    public  Set<Cell> findAdjacentPositionsBasedOnGivenCell(Cell[][] boardArray, Cell cell){
+        Set<Cell> contigousEmptyCellsFound = new LinkedHashSet<>();
+        boolean up =false, down = false, right = false, left = false, upRight =false, upLeft =false, downLeft = false, downRight = false;
+
+        for (int x = 1; x < 7; x++) {  //BOARD_COLUMNS - ROWVALUE should have the returning positions to the edge
+            //next element same row to the right
+            if (!right && cell.getRowElement() + x < 7  && boardArray[cell.getColumnIndex()][cell.getRowElement() + x].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DE LA DERECHA ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex()][cell.getRowElement() + x].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex()][cell.getRowElement() + x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()][cell.getRowElement() + x]);
+                    right = true;
+                }
+
+                if (boardArray[cell.getColumnIndex()][cell.getRowElement() + x].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()][cell.getRowElement() + x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()][cell.getRowElement() + x]);
+                    right = true;
+                }
+            }
+
+            if (!left && cell.getRowElement() - x > ZERO && boardArray[cell.getColumnIndex()][cell.getRowElement() - x].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DE LA IZQUIERDA ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex()][cell.getRowElement() - x].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex()][cell.getRowElement() - x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()][cell.getRowElement() - x]);
+                    left = true;
+                }
+
+                //SI ES UN NUMERO LO AGREGO AL ARREGLO Y TERMINO EL CICLO PARA EVITAR MAS NUMEROS AGREGADOS
+                if (boardArray[cell.getColumnIndex()][cell.getRowElement() - x].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()][cell.getRowElement() - x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()][cell.getRowElement() - x]);
+                    left = true;
+                }
+            }
+
+            //AGREGANDO ELEMENTO SUPERIOR
+            if (!up && cell.getColumnIndex() - x > ZERO && boardArray[cell.getColumnIndex()- x][cell.getRowElement()].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DE LA DERECHA ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex()- x][cell.getRowElement()].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex()- x][cell.getRowElement()].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()- x][cell.getRowElement()]);
+                    up = true;
+                }
+
+                if (boardArray[cell.getColumnIndex()- x][cell.getRowElement()].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()- x][cell.getRowElement()].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()- x][cell.getRowElement()]);
+                    up = true;
+                }
+            }
+            //agregando elemento debajo
+            if (!down && cell.getColumnIndex() + x < 7  && boardArray[cell.getColumnIndex()+ x][cell.getRowElement()].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex() + x][cell.getRowElement()].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex() + x][cell.getRowElement()].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()+ x][cell.getRowElement()]);
+                    down = true;
+                }
+
+                if (boardArray[cell.getColumnIndex()+ x][cell.getRowElement()].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()+ x][cell.getRowElement()].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()+ x][cell.getRowElement()]);
+                    down = true;
+                }
+            }
+
+            //AGREGANDO ELEMENTO DEBAJO Y A LA DERECHA
+            //agregando elemento debajo
+            if (!downRight && cell.getColumnIndex() + x < 7 && cell.getRowElement() + x < 7 && boardArray[cell.getColumnIndex()+ x][cell.getRowElement() +x].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex() + x][cell.getRowElement() +x].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex()+ x][cell.getRowElement()+x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()+ x][cell.getRowElement()+x]);
+                    downRight = true;
+                }
+
+                if (boardArray[cell.getColumnIndex()+ x][cell.getRowElement() + x].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()+ x][cell.getRowElement() + x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()+ x][cell.getRowElement() + x]);
+                    downRight = true;
+                }
+            }
+
+            //AGREGANDO ELEMENTO DEBAJO Y A LA IZQUIERDA
+            //agregando elemento debajo
+            if (!downLeft && cell.getColumnIndex() + x < 7 && cell.getRowElement() - x > ZERO && boardArray[cell.getColumnIndex()+ x][cell.getRowElement() -x].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex() + x][cell.getRowElement() -x].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex()+ x][cell.getRowElement()-x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()+ x][cell.getRowElement()-x]);
+                    downLeft = true;
+                }
+
+                if (!downLeft && boardArray[cell.getColumnIndex() + x][cell.getRowElement() - x].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()+ x][cell.getRowElement() - x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()+ x][cell.getRowElement() - x]);
+                    downLeft = true;
+                }
+            }
+
+            //AGREGANDO ELEMENTO ARRIBA Y A LA IZQUIERDA
+            //agregando elemento debajo
+            if (!upLeft && cell.getColumnIndex() - x > ZERO && cell.getRowElement() - x > ZERO && boardArray[cell.getColumnIndex()- x][cell.getRowElement() -x].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex() - x][cell.getRowElement() -x].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex()- x][cell.getRowElement()-x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()- x][cell.getRowElement()-x]);
+                    upLeft = true;
+                }
+
+                if (boardArray[cell.getColumnIndex()- x][cell.getRowElement() - x].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()- x][cell.getRowElement() - x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()- x][cell.getRowElement() - x]);
+                    upLeft = true;
+                }
+            }
+            //AGREGANDO ELEMENTO ARRIBA Y A LA DERECHA
+            //agregando elemento debajo
+            if (!upRight && cell.getColumnIndex() - x > ZERO  && cell.getRowElement() + x < 7 && boardArray[cell.getColumnIndex()- x][cell.getRowElement() +x].getRowValue() != 100) {
+
+                //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
+                if (boardArray[cell.getColumnIndex() - x][cell.getRowElement() +x].getGameRole().equalsIgnoreCase("Empty")) {
+                    boardArray[cell.getColumnIndex() - x][cell.getRowElement()+x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex() - x][cell.getRowElement()+x]);
+                    upRight = true;
+                }
+
+                if (boardArray[cell.getColumnIndex()- x][cell.getRowElement() + x].getGameRole().equalsIgnoreCase("Number")) {
+                    boardArray[cell.getColumnIndex()- x][cell.getRowElement() + x].setSeen(true);
+                    contigousEmptyCellsFound.add(boardArray[cell.getColumnIndex()- x][cell.getRowElement() + x]);
+                    upRight = true;
+                }
+            }
+        }
+
+        return contigousEmptyCellsFound;
+    }
 }
