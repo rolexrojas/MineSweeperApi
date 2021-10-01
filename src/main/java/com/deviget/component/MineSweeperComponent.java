@@ -5,6 +5,7 @@ import com.deviget.types.BoardMoveResponse;
 import com.deviget.types.BoardMoveResponseType;
 import com.deviget.types.CellTypes;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -189,6 +190,7 @@ public class MineSweeperComponent {
 
         if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.EMPTY.label)){
             System.out.println("Clicked a Empty => " + cellBoard.getColumnIndex() + cellBoard.getRowElement() + cellBoard.getGameRole());
+            boardMoveResponse = fillEmptyAdjacentPositions(this.getBoardArray(), cellBoard);
         }
 
         if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.NUMBER.label)){
@@ -255,6 +257,66 @@ public class MineSweeperComponent {
         }
 
         return resp;
+    }
+
+    public BoardMoveResponse fillEmptyAdjacentPositions(Cell[][] boardArray, Cell cell){
+        Set<Cell> listOfElements = new LinkedHashSet<>();
+        Set<Cell> justNumbersList = new LinkedHashSet<>();
+        Set<Cell> justEmptyList = new LinkedHashSet<>();
+        Set<Cell> elementsToEvaluate;
+
+        listOfElements.add(cell);
+
+        /**
+         * This iteration is to make sure the loop doesn't finish until evaluation size has checked all elements
+         * */
+        for(int x =0; x < listOfElements.size(); x++) {
+            //System.out.println("listOfElement size=> " + listOfElements.size());
+            //System.out.println("Iteration Counter=> " + x);
+            elementsToEvaluate = new LinkedHashSet<>(findElementsToEvaluate(boardArray, listOfElements));
+            listOfElements.remove(cell);
+            //System.out.println("Consumed elements list");
+            for (Cell comboCell : elementsToEvaluate) {
+                if (comboCell.getGameRole().equalsIgnoreCase("Number")) {
+                    justNumbersList.add(comboCell);
+                    listOfElements.remove(comboCell);
+                }
+
+                if (comboCell.getGameRole().equalsIgnoreCase("Empty")) {
+                    justEmptyList.add(comboCell);
+                    boolean resp = listOfElements.add(comboCell);
+                    if (!resp) {
+                        //System.out.println("found duplicated element: " + comboCell.getColumnIndex() + comboCell.getRowElement());
+                        listOfElements.remove(comboCell);
+                    }
+                }
+            }
+
+        }
+
+        BoardMoveResponse boardMoveResponse = new BoardMoveResponse();
+        boardMoveResponse.setNumberCellList(justNumbersList);
+        boardMoveResponse.setEmptyCellList(justEmptyList);
+        boardMoveResponse.setBoardMoveResponseType(BoardMoveResponseType.GAME_INFO);
+
+        return boardMoveResponse;
+    }
+
+    private Set<Cell> findElementsToEvaluate(Cell[][] boardArray, Set<Cell> evaluationList){
+        Set<Cell> elementFound = new LinkedHashSet<>();
+        //System.out.println("Eval List size= " + evaluationList.size());
+        //This iteration make sure to run trough all elements of evaluation list
+        Iterator<Cell> itr = evaluationList.iterator();
+        while(itr.hasNext()) {
+            Cell currentElement = itr.next();
+            //System.out.println("celda a evaluar " + currentElement.getColumnIndex() + currentElement.getRowElement() + currentElement.getGameRole());
+            //sino se ha evaluado se buscan los elementos adjacentes
+            //if(!currentElement.checked){
+            Set<Cell> cells = findAdjacentPositionsBasedOnGivenCell(boardArray, currentElement);
+            elementFound.addAll(cells);
+        }
+
+        return elementFound;
     }
 
     public  Set<Cell> findAdjacentPositionsBasedOnGivenCell(Cell[][] boardArray, Cell cell){

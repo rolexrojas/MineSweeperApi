@@ -17,9 +17,9 @@ public class MineSweeperApplication {
 		BoardMoveResponse boardMoveResponse = mineSweeperComponent.makeMoveAndGetResult(1, 1);
 		System.out.println();
 		System.out.println(boardMoveResponse.getBoardMoveResponseType().label);
-		System.out.println(boardMoveResponse.getBombCellList());
-		System.out.println(boardMoveResponse.getEmptyCellList());
-		System.out.println(boardMoveResponse.getNumberCellList());
+		System.out.println(boardMoveResponse.getBombCellList().size());
+		System.out.println(boardMoveResponse.getEmptyCellList().size());
+		System.out.println(boardMoveResponse.getNumberCellList().size());
 	}
 
 }
