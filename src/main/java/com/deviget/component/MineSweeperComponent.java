@@ -2,11 +2,13 @@ package com.deviget.component;
 
 import com.deviget.domain.Cell;
 import com.deviget.domain.GameState;
+import com.deviget.exception.DuplicateKeyException;
 import com.deviget.exception.NoGameFoundException;
 import com.deviget.repository.GameStateRepository;
 import com.deviget.types.BoardMoveResponse;
 import com.deviget.types.BoardMoveResponseType;
 import com.deviget.types.CellTypes;
+import com.deviget.utils.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,8 @@ public class MineSweeperComponent {
     private Cell[][] boardArray;
     private Cell[][] minesArray;
     private GameStateRepository gameStateRepository;
+    private long startTime = 0L;
+    private final int ZERO = 0;
 
     @Autowired
     public void setGameStateRepository(GameStateRepository gameStateRepository) {
@@ -47,9 +51,14 @@ public class MineSweeperComponent {
         return minesOnBoard;
     }
 
+    private long getStartTime() {
+        return startTime;
+    }
 
+    private void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 
-    private final int ZERO = 0;
 
     public void clearGameData(){
         setBoardArray(null);
@@ -100,6 +109,8 @@ public class MineSweeperComponent {
         this.setBoardArray(setNumbersInBoard(boardArray));
 
         displayBoardState(boardArray);
+
+        setStartTime(System.currentTimeMillis());
     }
 
     public void populateBoardArray(Cell[][] boardArray){
@@ -220,23 +231,33 @@ public class MineSweeperComponent {
         }
     }
 
-    public BoardMoveResponse makeMoveAndGetResult(int columnIndex, int rowIndex){
+    public BoardMoveResponse makeMoveAndGetResult(int columnIndex,  int rowIndex) throws DuplicateKeyException, NoGameFoundException {
 
         Cell cell = new Cell(columnIndex, rowIndex,  0, "Empty");
         System.out.println("Clicked Cell=> " + cell.getColumnIndex() + " | " + cell.getRowElement());
 
+        if(this.getBoardArray() == null){
+            throw new NoGameFoundException("No game was found");
+        }
 
         Cell cellBoard = this.getBoardArray()[cell.getColumnIndex()][cell.getRowElement()];
 
+        if(cellBoard.isSeen()){
+            throw new DuplicateKeyException("This board key has already been revealed");
+        }
         //marked as revealed
         cellBoard.setSeen(true);
         BoardMoveResponse boardMoveResponse = new BoardMoveResponse();
         LinkedHashSet<Cell> numberCell = new LinkedHashSet<>();
         LinkedHashSet<Cell> emptyCell = new LinkedHashSet<>();
 
+        int secs = Utilities.timerCount(getStartTime(), System.currentTimeMillis());
+        String duration = String.format("Time Elapsed: %s Seconds", secs);
+
         if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.EMPTY.label)){
             System.out.println("Clicked a Empty => " + cellBoard.getColumnIndex() + cellBoard.getRowElement() + cellBoard.getGameRole());
             boardMoveResponse = fillEmptyAdjacentPositions(this.getBoardArray(), cellBoard);
+            boardMoveResponse.setDuration(duration);
         }
 
         if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.NUMBER.label)){
@@ -245,7 +266,7 @@ public class MineSweeperComponent {
             numberCell.add(cellBoard);
             boardMoveResponse.setEmptyCellList(emptyCell);
             boardMoveResponse.setNumberCellList(numberCell);
-
+            boardMoveResponse.setDuration(duration);
         }
 
         if(cellBoard.getGameRole().equalsIgnoreCase(CellTypes.BOMB.label)){
@@ -255,7 +276,9 @@ public class MineSweeperComponent {
             boardMoveResponse.setEmptyCellList(emptyCell);
             boardMoveResponse.setNumberCellList(numberCell);
             boardMoveResponse.setBombCellList(getMinesOnBoard());
+            boardMoveResponse.setDuration(duration);
             //End Of game and return all bombs
+            clearGameData();
 
             return  boardMoveResponse;
         }
@@ -270,6 +293,7 @@ public class MineSweeperComponent {
                 if(x == 20)System.out.println();
                 x++;
             }
+            clearGameData();
         }
 
 
