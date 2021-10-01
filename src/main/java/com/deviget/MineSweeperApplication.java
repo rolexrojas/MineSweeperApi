@@ -10,16 +10,7 @@ public class MineSweeperApplication {
 
 	public static void main(String[] args) {
 
-		//SpringApplication.run(MineSweeperApplication.class, args);
-
-		MineSweeperComponent mineSweeperComponent = new MineSweeperComponent();
-		mineSweeperComponent.GameSetup();
-		BoardMoveResponse boardMoveResponse = mineSweeperComponent.makeMoveAndGetResult(1, 1);
-		System.out.println();
-		System.out.println(boardMoveResponse.getBoardMoveResponseType().label);
-		System.out.println(boardMoveResponse.getBombCellList().size());
-		System.out.println(boardMoveResponse.getEmptyCellList().size());
-		System.out.println(boardMoveResponse.getNumberCellList().size());
+		SpringApplication.run(MineSweeperApplication.class, args);
 	}
 
 }
