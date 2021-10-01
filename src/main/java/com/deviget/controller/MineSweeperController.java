@@ -47,6 +47,7 @@ public class MineSweeperController {
         if (!jwtManager.validateToken(token)) {
             ResponseEntity.status(400).body("{'Error': 'Invalid token'}");
         }
+
         //generate boardArray with no of cells
         System.out.println("GameSetup");
 
@@ -68,9 +69,9 @@ public class MineSweeperController {
             ResponseEntity.status(400).body("{'Error': 'Invalid token'}");
         }
 
-        System.out.println("saveGame");
+        System.out.println("tokenDataDTO" + tokenDataDTO.getUsername());
         try {
-            mineSweeperComponent.saveCurrentGame();
+            mineSweeperComponent.saveCurrentGame(tokenDataDTO.getUsername());
         } catch (Exception e) {
             return ResponseEntity.status(400).body("{'Error': 'Unexpected error'}");
         }
@@ -80,16 +81,17 @@ public class MineSweeperController {
 
 
     @GetMapping(path = "/resumeGame")
-    public ResponseEntity resumeGame(@RequestHeader(required = false, name = "Authorization") String token) {
+    public ResponseEntity resumeGame(@RequestHeader(required = true, name = "Authorization") String token) {
 
         TokenDataDTO tokenDataDTO = jwtManager.parseTokenToModel(token);
+        System.out.println("Username=> " + tokenDataDTO.getUsername());
         if (!jwtManager.validateToken(token)) {
             ResponseEntity.status(400).body("{'Error': 'Invalid token'}");
         }
 
         System.out.println("resumeGame");
         try {
-            mineSweeperComponent.resumeGame();
+            mineSweeperComponent.resumeGame(tokenDataDTO.getUsername());
         } catch (Exception e) {
             return ResponseEntity.status(400).body("{'Error': 'Unexpected error'}");
         }
@@ -98,7 +100,7 @@ public class MineSweeperController {
     }
 
     @GetMapping(path = "/makeMove")
-    public ResponseEntity makeMove(@RequestBody BoardMove aboardMove, @RequestHeader(required = false, name = "Authorization") String token) {
+    public ResponseEntity makeMove(@RequestBody BoardMove aboardMove, @RequestHeader(required = true, name = "Authorization") String token) {
 
         if (!jwtManager.validateToken(token)) {
             ResponseEntity.status(400).body("{'Error': 'Invalid token'}");

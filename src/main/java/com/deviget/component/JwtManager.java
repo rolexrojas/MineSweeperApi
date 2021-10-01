@@ -2,6 +2,7 @@ package com.deviget.component;
 
 import com.deviget.config.ApplicationProperties;
 import com.deviget.types.TokenDataDTO;
+import com.google.gson.Gson;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,8 +22,8 @@ public class JwtManager {
     }
 
     public String generateToken(String username, String password) {
-
-        String jwtPayLoad = generateJwtPayload(username, 20L);
+        Gson gson = new Gson();
+        String jwtPayLoad = gson.toJson(generateJwtPayload(username,20201188L));
         System.out.println("GeneratePayload => " + jwtPayLoad);
         // TODO what exactly
         Calendar calendar = GregorianCalendar.getInstance();
@@ -36,7 +37,14 @@ public class JwtManager {
     }
 
     private String parseToken(String token) {
-        return Jwts.parser().setSigningKey(applicationProperties.getTokenSecret().getBytes()).parseClaimsJws(token).getBody().getSubject();
+        String resp = "";
+        try {
+             resp = Jwts.parser().setSigningKey(applicationProperties.getTokenSecret().getBytes()).parseClaimsJws(token).getBody().getSubject();
+        }catch (Exception e){
+
+        }
+
+        return resp;
     }
 
     public String generateJwtPayload(String username, Long code) {
@@ -45,7 +53,8 @@ public class JwtManager {
 
 
     public boolean validateToken(String token) throws JwtException {
-        parseToken(token);
+       Gson gson = new Gson();
+        parseToken(gson.toJson(token));
         return true;
     }
 
@@ -53,7 +62,7 @@ public class JwtManager {
 
         token = token.replace("Bearer ", "");
 
-        String parseToken = parseToken(token);
+        String parseToken = parseToken(token.trim());
 
         String[] split = parseToken.split(":");
 
