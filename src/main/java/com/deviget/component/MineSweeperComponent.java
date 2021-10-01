@@ -1,5 +1,6 @@
 package com.deviget.component;
 
+import com.deviget.config.ApplicationProperties;
 import com.deviget.domain.Cell;
 import com.deviget.domain.GameState;
 import com.deviget.exception.DuplicateKeyException;
@@ -23,10 +24,16 @@ public class MineSweeperComponent {
     private GameStateRepository gameStateRepository;
     private long startTime = 0L;
     private final int ZERO = 0;
+    private ApplicationProperties applicationProperties;
 
     @Autowired
     public void setGameStateRepository(GameStateRepository gameStateRepository) {
         this.gameStateRepository = gameStateRepository;
+    }
+
+    @Autowired
+    public void setApplicationProperties(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
     }
 
     private Set<Cell> minesOnBoard = new LinkedHashSet<>();
@@ -58,6 +65,10 @@ public class MineSweeperComponent {
 
     private void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public Cell[][] getMinesArray() {
+        return minesArray;
     }
 
 
@@ -96,7 +107,7 @@ public class MineSweeperComponent {
 
     public void GameSetup() {
         //generate boardArray with no of cells
-        Cell[][] boardArray = new Cell[7][7];
+        Cell[][] boardArray = new Cell[applicationProperties.getBoardColumnSize()][applicationProperties.getBoardRowSize()];
 
         //populate two dimensional array with empty fields
         populateBoardArray(boardArray);
@@ -116,8 +127,8 @@ public class MineSweeperComponent {
 
     public void populateBoardArray(Cell[][] boardArray) {
 
-        for (int x = 1; x < 7; x++) {
-            for (int y = 1; y < 7; y++) {
+        for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {
+            for (int y = 1; y < applicationProperties.getBoardRowSize(); y++) {
                 boardArray[x][y] = new Cell(x, y, 0, "Empty");
             }
         }
@@ -125,9 +136,9 @@ public class MineSweeperComponent {
 
     public Cell[][] dynamicMineGenerator() {
 
-        Cell[][] minePlace = new Cell[7][7];
-        for (int x = 1; x <= 7; x++) {
-            Cell bomb1 = new Cell((int) (Math.random() * (7 - 1) + 1), (int) (Math.random() * (7 - 1) + 1), 100, "Bomb");
+        Cell[][] minePlace = new Cell[applicationProperties.getBoardColumnSize()][applicationProperties.getBoardRowSize()];
+        for (int x = 1; x <= applicationProperties.getBoardColumnSize(); x++) {
+            Cell bomb1 = new Cell((int) (Math.random() * (applicationProperties.getBoardColumnSize() - 1) + 1), (int) (Math.random() * (applicationProperties.getBoardRowSize() - 1) + 1), 100, "Bomb");
             System.out.println("Mine => " + bomb1.getColumnIndex() + bomb1.getRowElement());
             minePlace[bomb1.getColumnIndex()][bomb1.getRowElement()] = bomb1;
         }
@@ -138,8 +149,8 @@ public class MineSweeperComponent {
     public void placeMinesInBoard(Cell[][] boardArray, Cell[][] mines) {
 
         Set<Cell> minesOnBoard = new LinkedHashSet<>();
-        for (int x = 1; x < 7; x++) {
-            for (int y = 1; y < 7; y++) {
+        for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {
+            for (int y = 1; y < applicationProperties.getBoardRowSize(); y++) {
 
                 try {
                     if (mines[x][y] != null) {
@@ -160,12 +171,12 @@ public class MineSweeperComponent {
     public Cell[][] setNumbersInBoard(Cell[][] boardArray) {
 
         System.out.println("boardArraySize: " + boardArray.length);
-        for (int x = 1; x < 7; x++) {
-            for (int y = 1; y < 7; y++) {
+        for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {
+            for (int y = 1; y < applicationProperties.getBoardRowSize(); y++) {
                 if (boardArray[x][y].getGameRole().equalsIgnoreCase("Bomb")) {
 
                     //next element same row to the right
-                    if (y + 1 < 7 && boardArray[x][y + 1].getRowValue() != 100) {
+                    if (y + 1 < applicationProperties.getBoardRowSize() && boardArray[x][y + 1].getRowValue() != 100) {
                         boardArray[x][y + 1].setRowValue(boardArray[x][y + 1].getRowValue() + 1);
                         boardArray[x][y + 1].setGameRole("Number");
                     }
@@ -189,26 +200,26 @@ public class MineSweeperComponent {
                     }
 
                     //element right above and to the right
-                    if (x - 1 > ZERO && y + 1 < 7 && boardArray[x - 1][y + 1].getRowValue() != 100) {
+                    if (x - 1 > ZERO && y + 1 < applicationProperties.getBoardRowSize() && boardArray[x - 1][y + 1].getRowValue() != 100) {
                         boardArray[x - 1][y + 1].setRowValue(boardArray[x - 1][y + 1].getRowValue() + 1);
                         boardArray[x - 1][y + 1].setGameRole("Number");
                     }
 
                     //Below ZOne
                     //element right below
-                    if (x + 1 < 7 && boardArray[x + 1][y].getRowValue() != 100) {
+                    if (x + 1 < applicationProperties.getBoardColumnSize() && boardArray[x + 1][y].getRowValue() != 100) {
                         boardArray[x + 1][y].setRowValue(boardArray[x + 1][y].getRowValue() + 1);
                         boardArray[x + 1][y].setGameRole("Number");
                     }
 
                     //element right below and to the left
-                    if (x + 1 < 7 && y - 1 > ZERO && boardArray[x + 1][y - 1].getRowValue() != 100) {
+                    if (x + 1 < applicationProperties.getBoardColumnSize() && y - 1 > ZERO && boardArray[x + 1][y - 1].getRowValue() != 100) {
                         boardArray[x + 1][y - 1].setRowValue(boardArray[x + 1][y - 1].getRowValue() + 1);
                         boardArray[x + 1][y - 1].setGameRole("Number");
                     }
 
                     //element right below and to the right
-                    if (x + 1 < 7 && y + 1 < 7 && boardArray[x + 1][y + 1].getRowValue() != 100) {
+                    if (x + 1 < applicationProperties.getBoardColumnSize() && y + 1 < applicationProperties.getBoardRowSize() && boardArray[x + 1][y + 1].getRowValue() != 100) {
                         boardArray[x + 1][y + 1].setRowValue(boardArray[x + 1][y + 1].getRowValue() + 1);
                         boardArray[x + 1][y + 1].setGameRole("Number");
                     }
@@ -221,9 +232,9 @@ public class MineSweeperComponent {
 
     private void displayBoardState(Cell[][] boardArray) {
         System.out.println("Internal Game Created");
-        for (int x = 1; x < 7; x++) {
+        for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {
             System.out.println();
-            for (int y = 1; y < 7; y++) {
+            for (int y = 1; y < applicationProperties.getBoardRowSize(); y++) {
                 if (boardArray[x][y] != null) {
                     System.out.print(boardArray[x][y].getColumnIndex() + "" + boardArray[x][y].getRowElement() + "[" + boardArray[x][y].getGameRole() + " || Seen? " + boardArray[x][y].isSeen() + "]");
                 }
@@ -305,12 +316,12 @@ public class MineSweeperComponent {
     public boolean hasWinGame(Cell[][] boardArray) {
 
         System.out.println("GAME VIEW REPRESENTATION");
-        int totalToWin = ((7 - 1) * (7 - 1) - 4);
+        int totalToWin = ((applicationProperties.getBoardColumnSize() - 1) * (applicationProperties.getBoardRowSize() - 1) - applicationProperties.getMineTotal());
         boolean resp = false;
         int leftCounter = 0;
-        for (int x = 1; x < 7; x++) {
+        for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {
             System.out.println();
-            for (int y = 1; y < 7; y++) {
+            for (int y = 1; y < applicationProperties.getBoardRowSize(); y++) {
                 if (boardArray[x][y] != null) {
 
                     String viewStatus = boardArray[x][y].isSeen() ? "[---" + boardArray[x][y].getRowValue() + "--]" : "[Hidden]";
@@ -394,9 +405,9 @@ public class MineSweeperComponent {
         Set<Cell> contigousEmptyCellsFound = new LinkedHashSet<>();
         boolean up = false, down = false, right = false, left = false, upRight = false, upLeft = false, downLeft = false, downRight = false;
 
-        for (int x = 1; x < 7; x++) {  //BOARD_COLUMNS - ROWVALUE should have the returning positions to the edge
+        for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {  //BOARD_COLUMNS - ROWVALUE should have the returning positions to the edge
             //next element same row to the right
-            if (!right && cell.getRowElement() + x < 7 && boardArray[cell.getColumnIndex()][cell.getRowElement() + x].getRowValue() != 100) {
+            if (!right && cell.getRowElement() + x < applicationProperties.getBoardColumnSize() && boardArray[cell.getColumnIndex()][cell.getRowElement() + x].getRowValue() != 100) {
 
                 //SI EL ELEMENTO DE LA DERECHA ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
                 if (boardArray[cell.getColumnIndex()][cell.getRowElement() + x].getGameRole().equalsIgnoreCase("Empty")) {
@@ -446,7 +457,7 @@ public class MineSweeperComponent {
                 }
             }
             //agregando elemento debajo
-            if (!down && cell.getColumnIndex() + x < 7 && boardArray[cell.getColumnIndex() + x][cell.getRowElement()].getRowValue() != 100) {
+            if (!down && cell.getColumnIndex() + x < applicationProperties.getBoardColumnSize() && boardArray[cell.getColumnIndex() + x][cell.getRowElement()].getRowValue() != 100) {
 
                 //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
                 if (boardArray[cell.getColumnIndex() + x][cell.getRowElement()].getGameRole().equalsIgnoreCase("Empty")) {
@@ -464,7 +475,7 @@ public class MineSweeperComponent {
 
             //AGREGANDO ELEMENTO DEBAJO Y A LA DERECHA
             //agregando elemento debajo
-            if (!downRight && cell.getColumnIndex() + x < 7 && cell.getRowElement() + x < 7 && boardArray[cell.getColumnIndex() + x][cell.getRowElement() + x].getRowValue() != 100) {
+            if (!downRight && cell.getColumnIndex() + x < applicationProperties.getBoardColumnSize() && cell.getRowElement() + x < applicationProperties.getBoardColumnSize() && boardArray[cell.getColumnIndex() + x][cell.getRowElement() + x].getRowValue() != 100) {
 
                 //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
                 if (boardArray[cell.getColumnIndex() + x][cell.getRowElement() + x].getGameRole().equalsIgnoreCase("Empty")) {
@@ -482,7 +493,7 @@ public class MineSweeperComponent {
 
             //AGREGANDO ELEMENTO DEBAJO Y A LA IZQUIERDA
             //agregando elemento debajo
-            if (!downLeft && cell.getColumnIndex() + x < 7 && cell.getRowElement() - x > ZERO && boardArray[cell.getColumnIndex() + x][cell.getRowElement() - x].getRowValue() != 100) {
+            if (!downLeft && cell.getColumnIndex() + x < applicationProperties.getBoardColumnSize() && cell.getRowElement() - x > ZERO && boardArray[cell.getColumnIndex() + x][cell.getRowElement() - x].getRowValue() != 100) {
 
                 //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
                 if (boardArray[cell.getColumnIndex() + x][cell.getRowElement() - x].getGameRole().equalsIgnoreCase("Empty")) {
@@ -517,7 +528,7 @@ public class MineSweeperComponent {
             }
             //AGREGANDO ELEMENTO ARRIBA Y A LA DERECHA
             //agregando elemento debajo
-            if (!upRight && cell.getColumnIndex() - x > ZERO && cell.getRowElement() + x < 7 && boardArray[cell.getColumnIndex() - x][cell.getRowElement() + x].getRowValue() != 100) {
+            if (!upRight && cell.getColumnIndex() - x > ZERO && cell.getRowElement() + x < applicationProperties.getBoardColumnSize() && boardArray[cell.getColumnIndex() - x][cell.getRowElement() + x].getRowValue() != 100) {
 
                 //SI EL ELEMENTO DEBAJO ESTA VACIO SIMPLEMENTE LO AGREGO AL ARREGLO
                 if (boardArray[cell.getColumnIndex() - x][cell.getRowElement() + x].getGameRole().equalsIgnoreCase("Empty")) {
