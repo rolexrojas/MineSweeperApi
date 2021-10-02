@@ -72,11 +72,17 @@ public class MineSweeperComponent {
     }
 
 
+
     public void clearGameData() {
         setBoardArray(null);
         setMinesArray(null);
     }
 
+    /**
+     * saveCurrentGame
+     * @param username username used to save the current game to db
+     * @throws NoGameFoundException when no game is found in order to save
+     */
     public void saveCurrentGame(String username) throws NoGameFoundException {
 
         if (this.getBoardArray() == null) {
@@ -90,6 +96,13 @@ public class MineSweeperComponent {
         gameStateRepository.save(gameState);
     }
 
+
+
+    /**
+     * resumeGame
+     * @param username username used to retrieve the sved game from db
+     * @throws NoGameFoundException when no game is found in order to save
+     */
     public void resumeGame(String username) throws NoGameFoundException {
         try {
             clearGameData();
@@ -105,6 +118,10 @@ public class MineSweeperComponent {
         }
     }
 
+    /**
+     * GameSetup
+     * This method initialize a new game
+     */
     public void GameSetup() {
         //generate boardArray with no of cells
         Cell[][] boardArray = new Cell[applicationProperties.getBoardColumnSize()][applicationProperties.getBoardRowSize()];
@@ -125,6 +142,10 @@ public class MineSweeperComponent {
         setStartTime(System.currentTimeMillis());
     }
 
+    /**
+     * populateBoardArray
+     * @param boardArray receives a 2d array representing an empty board
+     */
     public void populateBoardArray(Cell[][] boardArray) {
 
         for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {
@@ -134,6 +155,12 @@ public class MineSweeperComponent {
         }
     }
 
+    /**
+     * dynamicMineGenerator
+     * This methods create randomly generated mines and placed in an empty board
+     *  that clones the size of the original board
+     * @return 2D array representing the minesweeper board
+     */
     public Cell[][] dynamicMineGenerator() {
 
         Cell[][] minePlace = new Cell[applicationProperties.getBoardColumnSize()][applicationProperties.getBoardRowSize()];
@@ -146,6 +173,14 @@ public class MineSweeperComponent {
         return minePlace;
     }
 
+    /**
+     * placeMinesInBoard
+     *
+     * This method takes a board with same size of game board and place the mines in the current game board
+     *
+     * @param boardArray 2d game representation of game cells
+     * @param mines 2d game representation of mines positions
+     */
     public void placeMinesInBoard(Cell[][] boardArray, Cell[][] mines) {
 
         Set<Cell> minesOnBoard = new LinkedHashSet<>();
@@ -167,7 +202,12 @@ public class MineSweeperComponent {
         setMinesOnBoard(minesOnBoard);
     }
 
-
+    /**
+     * setNumbersInBoard
+     * This methods place the numbers in the minesweeper board
+     * @param boardArray 2d array that represents the current game
+     * @return 2d array
+     */
     public Cell[][] setNumbersInBoard(Cell[][] boardArray) {
 
         System.out.println("boardArraySize: " + boardArray.length);
@@ -230,6 +270,10 @@ public class MineSweeperComponent {
         return boardArray;
     }
 
+    /**
+     * displayBoardState: receives and print each cell and its properties to console output
+     * @param boardArray contains full list of items that are being evaluated in the matching line iteration
+     */
     private void displayBoardState(Cell[][] boardArray) {
         System.out.println("Internal Game Created");
         for (int x = 1; x < applicationProperties.getBoardColumnSize(); x++) {
@@ -243,6 +287,14 @@ public class MineSweeperComponent {
         }
     }
 
+    /**
+     * makeMoveAndGetResult: This methods receive a board position and extract the cell and its value
+     * @param columnIndex Positive value pointing to column position of 2d game board array
+     * @param rowIndex Positive value pointing to column position of 2d game board array
+     * @return BoardMoveResponse object containing details about the element/cell found
+     * @throws DuplicateKeyException when the board position has already been revealed
+     * @throws NoGameFoundException when there is not a current game found
+     */
     public BoardMoveResponse makeMoveAndGetResult(int columnIndex, int rowIndex) throws DuplicateKeyException, NoGameFoundException {
 
         Cell cell = new Cell(columnIndex, rowIndex, 0, "Empty");
@@ -312,7 +364,11 @@ public class MineSweeperComponent {
         return boardMoveResponse;
     }
 
-
+    /**
+     * hasWinGame: This methods count over the cells (empty cells and number) that are unrevealed in the board
+     * when thecout matches cero it lauches the game win flow
+     * @param boardArray 2d representation of the minesweeper game board.
+     */
     public boolean hasWinGame(Cell[][] boardArray) {
 
         System.out.println("GAME VIEW REPRESENTATION");
@@ -341,6 +397,15 @@ public class MineSweeperComponent {
         return resp;
     }
 
+
+    /**
+     * fillEmptyAdjacentPositions: misleading name for this one
+     * This methods separate the numbers and cells and prepare the response object
+     * @param boardArray 2d bi-dimensional array representation of minesweeper game board
+     * @param cell specific cell location received from the user
+     * @return boardMoveResponse object containing list of numbers cells,  empty cells found adjacent to the given
+     * number.
+     */
     public BoardMoveResponse fillEmptyAdjacentPositions(Cell[][] boardArray, Cell cell) {
         Set<Cell> listOfElements = new LinkedHashSet<>();
         Set<Cell> justNumbersList = new LinkedHashSet<>();
@@ -384,6 +449,12 @@ public class MineSweeperComponent {
         return boardMoveResponse;
     }
 
+    /**
+     * findElementsToEvaluate
+     * @param boardArray 2d bi-dimensional array representation of minesweeper game board
+     * @param evaluationList list of method chosen to find its next adjacent elements
+     * @return Set collections containing the cell elements found
+     */
     private Set<Cell> findElementsToEvaluate(Cell[][] boardArray, Set<Cell> evaluationList) {
         Set<Cell> elementFound = new LinkedHashSet<>();
         //System.out.println("Eval List size= " + evaluationList.size());
@@ -401,6 +472,12 @@ public class MineSweeperComponent {
         return elementFound;
     }
 
+    /**
+     * fillEmptyAdjacentPositions
+     * @param boardArray 2d bi-dimensional array representation of minesweeper game board
+     * @param cell specific cell location received from the user
+     * @return Set collection containing all cells found adjacent to the given number.
+     */
     public Set<Cell> findAdjacentPositionsBasedOnGivenCell(Cell[][] boardArray, Cell cell) {
         Set<Cell> contigousEmptyCellsFound = new LinkedHashSet<>();
         boolean up = false, down = false, right = false, left = false, upRight = false, upLeft = false, downLeft = false, downRight = false;
