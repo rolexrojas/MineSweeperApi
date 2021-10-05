@@ -164,7 +164,7 @@ public class MineSweeperComponent {
     public Cell[][] dynamicMineGenerator() {
 
         Cell[][] minePlace = new Cell[applicationProperties.getBoardColumnSize()][applicationProperties.getBoardRowSize()];
-        for (int x = 1; x <= applicationProperties.getBoardColumnSize(); x++) {
+        for (int x = 1; x <= applicationProperties.getMineTotal(); x++) {
             Cell bomb1 = new Cell((int) (Math.random() * (applicationProperties.getBoardColumnSize() - 1) + 1), (int) (Math.random() * (applicationProperties.getBoardRowSize() - 1) + 1), 100, "Bomb");
             System.out.println("Mine => " + bomb1.getColumnIndex() + bomb1.getRowElement());
             minePlace[bomb1.getColumnIndex()][bomb1.getRowElement()] = bomb1;
